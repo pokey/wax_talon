@@ -1,11 +1,8 @@
-from talon import Context, app, ui
+from talon import Module, app, ui
 
-from .recorder import Recorder
+from ..types import Recorder
 
-ctx = Context()
-ctx.matches = r"""
-os: mac
-"""
+mod = Module()
 
 
 def show_obs_menu():
@@ -21,7 +18,7 @@ def show_obs_menu():
     return menu
 
 
-@ctx.action_class("user")
+@mod.action_class
 class Actions:
     def get_obs_recorder() -> Recorder:
         return ObsRecorder()

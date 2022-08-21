@@ -3,11 +3,12 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml
-from talon import Context, actions, ui
+from talon import Context, Module, actions, ui
 from talon.ui import UIErr
 
-from .recorder import ExtraCaptureFields, PhraseInfo, Recorder, RecordingContext
+from ..types import PhraseInfo, Recorder, RecordingContext
 
+mod = Module()
 ctx = Context()
 
 recording_screen_vscode_ctx = Context()
@@ -20,10 +21,20 @@ snapshots_directory: Path
 recording_context: RecordingContext
 
 
-@ctx.action_class("user")
+@mod.action_class
 class Actions:
     def get_cursorless_recorder(should_take_mark_screenshots: bool) -> Recorder:
         return CursorlessRecorder(should_take_mark_screenshots)
+
+    def _wax_cursorless_snapshot(path: str, metadata: Any, decorated_marks: list[dict]):
+        """Take a Cursorless pre- or post-phrase snapshot"""
+
+
+@ctx.action_class("user")
+class UserActions:
+    def _wax_cursorless_snapshot(path: str, metadata: Any, decorated_marks: list[dict]):
+        # Turn this one off globally
+        pass
 
 
 class CursorlessRecorder(Recorder):
@@ -38,7 +49,7 @@ class CursorlessRecorder(Recorder):
         # VSCode needs to be running
         get_vscode_app()
 
-    def start_recording(self, context: RecordingContext) -> dict:
+    def start_recording(self, context: RecordingContext):
         global snapshots_directory
         global recording_context
 
@@ -62,29 +73,22 @@ class CursorlessRecorder(Recorder):
             },
         )
 
-        return {"extensionRecordStartPayload": command_payload}
+        actions.user.wax_log_object({"extensionRecordStartPayload": command_payload})
 
-    def capture_pre_phrase(self, phrase: PhraseInfo) -> ExtraCaptureFields:
+    def capture_pre_phrase(self, phrase: PhraseInfo):
         decorated_marks = list(extract_decorated_marks(phrase.parsed))
 
-        actions.user.take_snapshot(
+        actions.user._wax_cursorless_snapshot(
             str(snapshots_directory / f"{phrase.phrase_id}-prePhrase.yaml"),
             {"phraseId": phrase.phrase_id, "type": "prePhrase"},
             decorated_marks,
         )
 
-        mark_screenshots = None
-
         if self.should_take_mark_screenshots:
-            mark_screenshots = take_mark_screenshots(
-                decorated_marks,
-                recording_context.screenshots_directory,
-            )
-
-        return ExtraCaptureFields(screenshots=mark_screenshots or {})
+            take_mark_screenshots(decorated_marks)
 
     def capture_post_phrase(self, phrase: PhraseInfo):
-        actions.user.take_snapshot(
+        actions.user._wax_cursorless_snapshot(
             str(snapshots_directory / f"{phrase.phrase_id}-postPhrase.yaml"),
             {"phraseId": phrase.phrase_id, "type": "postPhrase"},
             [],
@@ -98,10 +102,7 @@ class CursorlessRecorder(Recorder):
         actions.user.vscode("cursorless.recordTestCase")
 
 
-def take_mark_screenshots(
-    decorated_marks: list[dict],
-    screenshots_directory: Path,
-):
+def take_mark_screenshots(decorated_marks: list[dict]):
     if not decorated_marks:
         return None
 
@@ -117,9 +118,7 @@ def take_mark_screenshots(
 
         actions.sleep("50ms")
 
-        all_decorated_marks_screenshot = capture_screen(
-            screenshots_directory, recording_start_time
-        )
+        actions.user.wax_capture_screen("decoratedMarks.all")
 
         actions.user.cursorless_single_target_command(
             "highlight",
@@ -129,8 +128,6 @@ def take_mark_screenshots(
             },
             "highlight1",
         )
-
-    return {"all": all_decorated_marks_screenshot}
 
 
 def extract_decorated_marks(parsed: Iterable[list[Any]]):
@@ -181,7 +178,7 @@ def cursorless_recording_paused():
 
 @recording_screen_vscode_ctx.action_class("user")
 class UserActions:
-    def take_snapshot(path: str, metadata: Any, decorated_marks: list[dict]):
+    def _wax_cursorless_snapshot(path: str, metadata: Any, decorated_marks: list[dict]):
         try:
             use_pre_phrase_snapshot = actions.user.did_emit_pre_phrase_signal()
         except KeyError:

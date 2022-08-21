@@ -1,14 +1,11 @@
-from talon import Context, actions, ui
+from talon import Module, actions, ui
 
-from .recorder import Recorder
+from ..types import Recorder
 
-ctx = Context()
-ctx.matches = r"""
-os: mac
-"""
+mod = Module()
 
 
-@ctx.action_class("user")
+@mod.action_class
 class Actions:
     def get_quicktime_recorder() -> Recorder:
         return QuicktimeRecorder()

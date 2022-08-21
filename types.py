@@ -1,19 +1,18 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
 
 
 @dataclass
 class RecordingContext:
     recording_log_directory: Path
-    screenshots_directory: Path
 
 
 @dataclass
 class PhraseInfo:
     phrase_id: str
-    parsed: Iterable[list[Any]]
+    parsed: list[list[Any]]
 
 
 @dataclass
@@ -47,12 +46,16 @@ class Recorder(ABC):
         pass
 
     @abstractmethod
-    def capture_pre_phrase(self) -> Optional[ExtraCaptureFields]:
+    def capture_pre_phrase(
+        self, phrase_info: PhraseInfo
+    ) -> Optional[ExtraCaptureFields]:
         """Capture anything you'd like to capture right before every phrase is executed"""
         pass
 
     @abstractmethod
-    def capture_post_phrase(self) -> Optional[ExtraCaptureFields]:
+    def capture_post_phrase(
+        self, phrase_info: PhraseInfo
+    ) -> Optional[ExtraCaptureFields]:
         """Capture anything you'd like to capture right after every phrase is executed"""
         pass
 
