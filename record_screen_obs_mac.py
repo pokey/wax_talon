@@ -1,6 +1,11 @@
 from talon import Context, app, ui
 
+from .recorder import Recorder
+
 ctx = Context()
+ctx.matches = r"""
+os: mac
+"""
 
 
 def show_obs_menu():
@@ -18,7 +23,12 @@ def show_obs_menu():
 
 @ctx.action_class("user")
 class Actions:
-    def obs_check_can_start():
+    def get_obs_recorder() -> Recorder:
+        return ObsRecorder()
+
+
+class ObsRecorder(Recorder):
+    def check_can_start(self):
         # Ensure that OBS is running
         try:
             next(app for app in ui.apps(background=False) if app.name == "OBS")
@@ -26,17 +36,23 @@ class Actions:
             app.notify("ERROR: Please launch OBS")
             raise
 
-    def obs_check_can_stop():
+    def check_can_stop(self):
         pass
 
-    def obs_start_recording():
+    def start_recording(self):
         # Start OBS face recording
         menu = show_obs_menu()
         menu.children.find_one(AXRole="AXMenuItem", AXTitle="Start Recording").perform(
             "AXPress"
         )
 
-    def obs_stop_recording():
+    def capture_pre_phrase(self):
+        pass
+
+    def capture_post_phrase(self):
+        pass
+
+    def stop_recording(self):
         # Stop OBS face recording
         menu = show_obs_menu()
         menu.children.find_one(AXRole="AXMenuItem", AXTitle="Stop Recording").perform(

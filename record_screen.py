@@ -2,12 +2,10 @@ import json
 import subprocess
 import time
 import uuid
-from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
 
-import yaml
 from talon import (
     Context,
     Module,
@@ -18,10 +16,10 @@ from talon import (
     screen,
     settings,
     speech_system,
-    ui,
 )
 from talon.canvas import Canvas
-from talon.ui import UIErr
+
+from .recorder import Recorder, RecordingContext
 
 CALIBRATION_DISPLAY_BACKGROUND_COLOR = "#1b0026"
 CALIBRATION_DISPLAY_DURATION = "50ms"
@@ -53,23 +51,13 @@ recording_screen_ctx.matches = r"""
 tag: user.recording_screen
 """
 
-recording_screen_vscode_ctx = Context()
-recording_screen_vscode_ctx.matches = r"""
-tag: user.recording_screen
-app: vscode
-"""
-
-
 GIT = "/usr/local/bin/git"
 
-recording_start_time: float
-recorders: list[str]
-is_recording_face: bool
-recording_log_directory: Path
-screenshots_directory: Path
-snapshots_directory: Path
-recording_log_file: Path
 recordings_root_dir = Path.home() / "talon-recording-logs"
+
+recording_start_time: float
+recorders: list[Recorder]
+recording_context: RecordingContext
 
 
 def log_object(output_object):
@@ -89,35 +77,33 @@ def git(*args: str, cwd: Path):
 @mod.action_class
 class Actions:
     def start_recording(
-        recorder_1: Optional[str] = None,
-        recorder_2: Optional[str] = None,
-        recorder_3: Optional[str] = None,
+        recorder_1: Optional[Recorder] = None,
+        recorder_2: Optional[Recorder] = None,
+        recorder_3: Optional[Recorder] = None,
+        recorder_4: Optional[Recorder] = None,
+        recorder_5: Optional[Recorder] = None,
     ):
         """Start recording a talon session"""
         global recording_start_time
-        global recording_log_directory
+        global recording_context
         global screenshots_directory
-        global snapshots_directory
         global recording_log_file
         global current_phrase_id
         global recorders
 
-        recorders = list(filter(None, [recorder_1, recorder_2, recorder_3]))
+        recorders = list(
+            filter(None, [recorder_1, recorder_2, recorder_3, recorder_4, recorder_5])
+        )
 
         for recorder in recorders:
-            getattr(actions.user, f"{recorder}_check_can_start")()
+            recorder.check_can_start()
 
         recording_log_directory = recordings_root_dir / time.strftime(
             "%Y-%m-%dT%H-%M-%S"
         )
         recording_log_directory.mkdir(parents=True)
+
         recording_log_file = recording_log_directory / "talon-log.jsonl"
-
-        commands_directory = recording_log_directory / "commands"
-        commands_directory.mkdir(parents=True)
-
-        snapshots_directory = recording_log_directory / "snapshots"
-        snapshots_directory.mkdir(parents=True)
 
         screenshots_directory = recording_log_directory / "screenshots"
         screenshots_directory.mkdir(parents=True)
@@ -128,9 +114,17 @@ class Actions:
 
         current_phrase_id = None
 
+        recording_context = RecordingContext(
+            recording_log_directory, screenshots_directory
+        )
+
+        extra_initial_info_fields = {}
+
         for recorder in recorders:
             actions.sleep("250ms")
-            getattr(actions.user, f"{recorder}_start_recording")()
+            extra_initial_info_fields.update(
+                recorder.start_recording(recording_context) or {}
+            )
 
         # Flash a rectangle so that we can synchronize the recording start time
         flash_rect()
@@ -144,22 +138,22 @@ class Actions:
             {
                 "type": "initialInfo",
                 "version": 1,
-                "extensionRecordStartPayload": extension_payload,
                 "startTimestampISO": start_timestamp_iso,
                 "talonDir": str(user_dir.parent),
+                **extra_initial_info_fields,
             }
         )
 
     def record_screen_stop():
         """Stop recording screen"""
         for recorder in recorders:
-            getattr(actions.user, f"{recorder}_check_can_stop")()
+            recorder.check_can_stop()
 
         ctx.tags = []
 
         for recorder in recorders:
             actions.sleep("250ms")
-            getattr(actions.user, f"{recorder}_stop_recording")()
+            recorder.stop_recording()
 
         actions.user.post_record_screen_stop_hook()
 
@@ -327,20 +321,12 @@ class UserActions:
 
         current_phrase_id = str(uuid.uuid4())
 
-        decorated_marks = list(extract_decorated_marks(parsed))
-
-        actions.user.take_snapshot(
-            str(snapshots_directory / f"{current_phrase_id}-prePhrase.yaml"),
-            {"phraseId": current_phrase_id, "type": "prePhrase"},
-            decorated_marks,
-        )
-
         pre_command_screenshot = capture_screen(
             screenshots_directory, recording_start_time
         )
-        mark_screenshots = take_mark_screenshots(
-            decorated_marks, screenshots_directory, recording_start_time
-        )
+
+        for recorder in recorders:
+            recorder.capture_pre_phrase()
 
         log_object(
             {
@@ -369,11 +355,9 @@ class UserActions:
         global current_phrase_id
 
         if current_phrase_id is not None:
-            actions.user.take_snapshot(
-                str(snapshots_directory / f"{current_phrase_id}-postPhrase.yaml"),
-                {"phraseId": current_phrase_id, "type": "postPhrase"},
-                [],
-            )
+            for recorder in recorders:
+                recorder.capture_post_phrase()
+
             post_phrase_start = time.perf_counter() - recording_start_time
             post_command_screenshot = capture_screen(
                 screenshots_directory, recording_start_time
@@ -401,36 +385,6 @@ class UserActions:
             current_phrase_id = None
 
 
-@recording_screen_vscode_ctx.action_class("user")
-class UserActions:
-    def take_snapshot(path: str, metadata: Any, decorated_marks: list[dict]):
-        try:
-            use_pre_phrase_snapshot = actions.user.did_emit_pre_phrase_signal()
-        except KeyError:
-            use_pre_phrase_snapshot = False
-
-        try:
-            ui.active_window().children.find_one(AXRole="AXMenu", max_depth=0)
-            menu_showing = True
-        except UIErr:
-            menu_showing = False
-        if not menu_showing:
-            try:
-                actions.user.vscode_with_plugin_and_wait(
-                    "cursorless.takeSnapshot",
-                    path,
-                    metadata,
-                    decorated_marks,
-                    use_pre_phrase_snapshot,
-                )
-            except Exception as e:
-                with open(path, "w") as f:
-                    yaml.dump({"metadata": metadata, "error": str(e)}, f)
-        else:
-            with open(path, "w") as f:
-                yaml.dump({"metadata": metadata, "isMenuShowing": True}, f)
-
-
 def flash_rect():
     rect = screen.main_screen().rect
 
@@ -443,49 +397,6 @@ def flash_rect():
     canvas = Canvas.from_rect(rect)
     canvas.register("draw", on_draw)
     canvas.freeze()
-
-
-def take_mark_screenshots(
-    decorated_marks: list[dict],
-    screenshots_directory: Path,
-    recording_start_time: float,
-):
-    if not decorated_marks:
-        return None
-
-    all_decorated_marks_target = {
-        "type": "list",
-        "elements": [{"type": "primitive", "mark": mark} for mark in decorated_marks],
-    }
-
-    with cursorless_recording_paused():
-        actions.user.cursorless_single_target_command(
-            "highlight", all_decorated_marks_target, "highlight1"
-        )
-
-        actions.sleep("50ms")
-
-        all_decorated_marks_screenshot = capture_screen(
-            screenshots_directory, recording_start_time
-        )
-
-        actions.user.cursorless_single_target_command(
-            "highlight",
-            {
-                "type": "primitive",
-                "mark": {"type": "nothing"},
-            },
-            "highlight1",
-        )
-
-    return {"all": all_decorated_marks_screenshot}
-
-
-@contextmanager
-def cursorless_recording_paused():
-    actions.user.vscode("cursorless.pauseRecording")
-    yield
-    actions.user.vscode("cursorless.resumeRecording")
 
 
 def capture_screen(directory: Path, start_time: float):
@@ -505,45 +416,6 @@ def capture_screen(directory: Path, start_time: float):
         "filename": filename,
         "timeOffset": timestamp,
     }
-
-
-def extract_decorated_marks(parsed: Iterable[list[Any]]):
-    for capture_list in parsed:
-        for capture in capture_list:
-            items = capture if isinstance(capture, list) else [capture]
-            for item in items:
-                try:
-                    type = item["type"]
-                except (KeyError, TypeError):
-                    continue
-
-                if type not in {"primitive", "list", "range"}:
-                    continue
-
-                yield from extract_decorated_marks_from_target(item)
-
-
-def extract_decorated_marks_from_target(target: dict):
-    type = target["type"]
-
-    if type == "primitive":
-        yield from extract_decorated_marks_from_primitive_target(target)
-    elif type == "range":
-        yield from extract_decorated_marks_from_primitive_target(target["start"])
-        yield from extract_decorated_marks_from_primitive_target(target["end"])
-    elif type == "list":
-        for element in target["elements"]:
-            yield from extract_decorated_marks_from_target(element)
-
-
-def extract_decorated_marks_from_primitive_target(target: dict):
-    try:
-        mark = target["mark"]
-    except KeyError:
-        return
-
-    if mark["type"] == "decoratedSymbol":
-        yield mark
 
 
 last_phrase = None
