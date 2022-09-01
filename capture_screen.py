@@ -29,7 +29,7 @@ class Actions:
 
         screenshots[name] = screenshot_info
 
-    def _wax_init_capture_screen(
+    def x_wax_init_capture_screen(
         _recording_context: RecordingContext, _recording_start_time: float
     ):
         global recording_context
@@ -43,12 +43,12 @@ class Actions:
         )
         screenshots_directory.mkdir(parents=True)
 
-    def _wax_reset_screenshots_object():
+    def x_wax_reset_screenshots_object():
         global screenshots
 
         screenshots = {}
 
-    def _wax_get_screenshots_object() -> dict:
+    def x_wax_get_screenshots_object() -> dict:
         return screenshots
 
 

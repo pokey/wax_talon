@@ -92,7 +92,7 @@ class Actions:
         recording_start_time = time.perf_counter()
         start_timestamp_iso = datetime.utcnow().isoformat()
 
-        actions.user._wax_init_capture_screen(recording_context, recording_start_time)
+        actions.user.x_wax_init_capture_screen(recording_context, recording_start_time)
 
         user_dir: Path = Path(actions.path.talon_user())
 
@@ -223,7 +223,7 @@ class RecordingUserActions:
 
         current_phrase_info = PhraseInfo(phrase_id, parsed)
 
-        actions.user._wax_reset_screenshots_object()
+        actions.user.x_wax_reset_screenshots_object()
         actions.user.wax_capture_screen("preCommand")
 
         for recorder in recorders:
@@ -245,7 +245,7 @@ class RecordingUserActions:
                 "commands": commands,
                 "modes": list(scope.get("mode")),
                 "tags": list(scope.get("tag")),
-                "screenshots": actions.user._wax_get_screenshots_object(),
+                "screenshots": actions.user.x_wax_get_screenshots_object(),
             }
         )
 
@@ -258,7 +258,7 @@ class RecordingUserActions:
 
             post_phrase_start = time.perf_counter() - recording_start_time
 
-            actions.user._wax_reset_screenshots_object()
+            actions.user.x_wax_reset_screenshots_object()
             actions.user.wax_capture_screen("postCommand")
 
             # NB: This object will get merged with the pre-phrase object during
@@ -274,7 +274,7 @@ class RecordingUserActions:
                             time.perf_counter() - recording_start_time
                         ),
                     },
-                    "screenshots": actions.user._wax_get_screenshots_object(),
+                    "screenshots": actions.user.x_wax_get_screenshots_object(),
                 }
             )
 
