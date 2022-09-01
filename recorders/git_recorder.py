@@ -31,6 +31,7 @@ def git(*args: str, cwd: Path):
 
 class GitRecorder(Recorder):
     def check_can_start(self):
+        # Fails if any directories have uncommitted changes
         for directory in Path(actions.path.talon_user()).iterdir():
             if not directory.is_dir():
                 continue
@@ -45,6 +46,7 @@ class GitRecorder(Recorder):
                 raise Exception("Please commit all git changes")
 
     def start_recording(self, context: RecordingContext):
+        # Capture shas of all subdirectories of `.talon/user` that are `git` directories
         for directory in Path(actions.path.talon_user()).iterdir():
             if not directory.is_dir():
                 continue
