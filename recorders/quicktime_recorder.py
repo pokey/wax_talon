@@ -1,23 +1,29 @@
-from talon import Module, actions, ui
+from talon import Context, Module, actions, ui
 
 from ..types import Recorder
 
 mod = Module()
 
+ctx = Context()
+ctx.matches = r"""
+os: mac
+"""
+
 
 @mod.action_class
 class Actions:
     def get_quicktime_recorder() -> Recorder:
+        """Returns an object that can be used for recording quicktime"""
+        pass
+
+
+@ctx.action_class("user")
+class UserActions:
+    def get_quicktime_recorder():
         return QuicktimeRecorder()
 
 
 class QuicktimeRecorder(Recorder):
-    def check_can_start(self):
-        pass
-
-    def check_can_stop(self):
-        pass
-
     def start_recording(self):
         # Start quicktime screen recording
         actions.key("cmd-shift-5")
@@ -25,12 +31,6 @@ class QuicktimeRecorder(Recorder):
         actions.key("enter")
 
         actions.sleep("3s")
-
-    def capture_pre_phrase(self):
-        pass
-
-    def capture_post_phrase(self):
-        pass
 
     def stop_recording(self):
         # Stop quicktime screen recording

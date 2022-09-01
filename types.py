@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -15,14 +14,7 @@ class PhraseInfo:
     parsed: list[list[Any]]
 
 
-@dataclass
-class ExtraCaptureFields:
-    screenshots: dict[str, dict] = {}
-    extra_fields: dict = {}
-
-
-class Recorder(ABC):
-    @abstractmethod
+class Recorder:
     def check_can_start(self):
         """
         Checks that the necessary prerequisites are met to begin recording;
@@ -31,7 +23,6 @@ class Recorder(ABC):
         """
         pass
 
-    @abstractmethod
     def check_can_stop(self):
         """
         Checks that the necessary prerequisites are met to stop recording;
@@ -40,26 +31,18 @@ class Recorder(ABC):
         """
         pass
 
-    @abstractmethod
-    def start_recording(self, context: RecordingContext) -> Optional[dict]:
+    def start_recording(self, context: RecordingContext):
         """Begins recording for this recorder"""
         pass
 
-    @abstractmethod
-    def capture_pre_phrase(
-        self, phrase_info: PhraseInfo
-    ) -> Optional[ExtraCaptureFields]:
+    def capture_pre_phrase(self, phrase_info: PhraseInfo):
         """Capture anything you'd like to capture right before every phrase is executed"""
         pass
 
-    @abstractmethod
-    def capture_post_phrase(
-        self, phrase_info: PhraseInfo
-    ) -> Optional[ExtraCaptureFields]:
+    def capture_post_phrase(self, phrase_info: PhraseInfo):
         """Capture anything you'd like to capture right after every phrase is executed"""
         pass
 
-    @abstractmethod
     def stop_recording(self):
         """Stops recording for this recorder"""
         pass
