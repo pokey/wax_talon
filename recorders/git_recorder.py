@@ -3,7 +3,7 @@ from pathlib import Path
 
 from talon import Module, actions, app, ui
 
-from ..types import Recorder
+from ..types import Recorder, RecordingContext
 
 GIT = "/usr/local/bin/git"
 
@@ -44,7 +44,7 @@ class GitRecorder(Recorder):
                 app.notify("ERROR: Please commit all git changes")
                 raise Exception("Please commit all git changes")
 
-    def start_recording(self):
+    def start_recording(self, context: RecordingContext):
         for directory in Path(actions.path.talon_user()).iterdir():
             if not directory.is_dir():
                 continue

@@ -1,6 +1,6 @@
 from talon import Context, Module, actions, ui
 
-from ..types import Recorder
+from ..types import Recorder, RecordingContext
 
 mod = Module()
 
@@ -24,7 +24,7 @@ class UserActions:
 
 
 class QuicktimeRecorder(Recorder):
-    def start_recording(self):
+    def start_recording(self, context: RecordingContext):
         # Start quicktime screen recording
         actions.key("cmd-shift-5")
         actions.sleep("500ms")

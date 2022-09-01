@@ -1,6 +1,6 @@
 from talon import Context, Module, app, ui
 
-from ..types import Recorder
+from ..types import Recorder, RecordingContext
 
 mod = Module()
 
@@ -48,7 +48,7 @@ class ObsRecorder(Recorder):
             app.notify("ERROR: Please launch OBS")
             raise
 
-    def start_recording(self):
+    def start_recording(self, context: RecordingContext):
         # Start OBS face recording
         menu = show_obs_menu()
         menu.children.find_one(AXRole="AXMenuItem", AXTitle="Start Recording").perform(
