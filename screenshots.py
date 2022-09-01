@@ -16,7 +16,6 @@ screenshot_time_stamp_only = mod.setting(
 )
 
 screenshots_directory: Path
-recording_context: RecordingContext
 recording_start_time: float
 screenshots: dict
 
@@ -30,20 +29,19 @@ class Actions:
         screenshots[name] = screenshot_info
 
     def x_wax_init_screenshots(
-        _recording_context: RecordingContext, _recording_start_time: float
+        recording_context: RecordingContext, recording_start_time_: float
     ):
         """
         Initialize screenshot code
 
         Args:
-            _recording_context (RecordingContext): Context object with information about recording
-            _recording_start_time (float): The start time of the recording as returned by perfcounter
+            recording_context (RecordingContext): Context object with information about recording
+            recording_start_time_ (float): The start time of the recording as returned by perfcounter
         """
-        global recording_context
         global recording_start_time
+        global screenshots_directory
 
-        recording_context = _recording_context
-        recording_start_time = _recording_start_time
+        recording_start_time = recording_start_time_
 
         screenshots_directory = (
             recording_context.recording_log_directory / "screenshots"
