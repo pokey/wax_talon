@@ -23,15 +23,22 @@ screenshots: dict
 
 @mod.action_class
 class Actions:
-    def wax_capture_screen(name: str):
+    def wax_take_screenshot(name: str):
         """Captures the screen, either as a timestamp in video or to a file, depending on setting.  Name will determine key given to screenshot in log file"""
-        screenshot_info = capture_screen(screenshots_directory, recording_start_time)
+        screenshot_info = take_screenshot(screenshots_directory, recording_start_time)
 
         screenshots[name] = screenshot_info
 
-    def x_wax_init_capture_screen(
+    def x_wax_init_screenshots(
         _recording_context: RecordingContext, _recording_start_time: float
     ):
+        """
+        Initialize screenshot code
+
+        Args:
+            _recording_context (RecordingContext): Context object with information about recording
+            _recording_start_time (float): The start time of the recording as returned by perfcounter
+        """
         global recording_context
         global recording_start_time
 
@@ -44,15 +51,17 @@ class Actions:
         screenshots_directory.mkdir(parents=True)
 
     def x_wax_reset_screenshots_object():
+        """Removes all screenshots from the screenshot object"""
         global screenshots
 
         screenshots = {}
 
     def x_wax_get_screenshots_object() -> dict:
+        """Gets the screenshot object containing screenshots taken since last reset"""
         return screenshots
 
 
-def capture_screen(directory: Path, start_time: float):
+def take_screenshot(directory: Path, start_time: float):
     timestamp = time.perf_counter() - start_time
 
     if screenshot_time_stamp_only.get():

@@ -92,7 +92,7 @@ class Actions:
         recording_start_time = time.perf_counter()
         start_timestamp_iso = datetime.utcnow().isoformat()
 
-        actions.user.x_wax_init_capture_screen(recording_context, recording_start_time)
+        actions.user.x_wax_init_screenshots(recording_context, recording_start_time)
 
         user_dir: Path = Path(actions.path.talon_user())
 
@@ -224,7 +224,7 @@ class RecordingUserActions:
         current_phrase_info = PhraseInfo(phrase_id, parsed)
 
         actions.user.x_wax_reset_screenshots_object()
-        actions.user.wax_capture_screen("preCommand")
+        actions.user.wax_take_screenshot("preCommand")
 
         for recorder in recorders:
             recorder.capture_pre_phrase(current_phrase_info)
@@ -259,7 +259,7 @@ class RecordingUserActions:
             post_phrase_start = time.perf_counter() - recording_start_time
 
             actions.user.x_wax_reset_screenshots_object()
-            actions.user.wax_capture_screen("postCommand")
+            actions.user.wax_take_screenshot("postCommand")
 
             # NB: This object will get merged with the pre-phrase object during
             # postprocessing.  See

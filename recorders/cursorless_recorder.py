@@ -123,7 +123,7 @@ def take_mark_screenshots(decorated_marks: list[dict]):
 
         actions.sleep("50ms")
 
-        actions.user.wax_capture_screen("decoratedMarks.all")
+        actions.user.wax_take_screenshot("decoratedMarks.all")
 
         actions.user.cursorless_single_target_command(
             "highlight",
