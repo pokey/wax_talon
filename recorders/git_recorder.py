@@ -5,7 +5,7 @@ from talon import Module, actions, app, ui
 
 from ..types import Recorder, RecordingContext
 
-GIT = "/usr/local/bin/git"
+GIT = "git"
 
 mod = Module()
 
