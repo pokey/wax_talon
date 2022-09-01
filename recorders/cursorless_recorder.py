@@ -78,7 +78,9 @@ class CursorlessRecorder(Recorder):
             },
         )
 
-        actions.user.wax_log_object({"extensionRecordStartPayload": command_payload})
+        actions.user.wax_log_object(
+            {"type": "cursorlessInit", "extensionRecordStartPayload": command_payload}
+        )
 
     def capture_pre_phrase(self, phrase: PhraseInfo):
         decorated_marks = list(extract_decorated_marks(phrase.parsed))
