@@ -84,28 +84,46 @@ class Actions:
 
         recording_context = RecordingContext(recording_log_directory)
 
-        for recorder in recorders:
-            actions.sleep("250ms")
-            recorder.start_recording(recording_context)
+        active_recorders = []
 
-        # Flash a rectangle so that we can synchronize the recording start time
-        flash_rect()
+        try:
+            for recorder in recorders:
+                actions.sleep("250ms")
+                recorder.start_recording(recording_context)
+                active_recorders.append(recorder)
 
-        recording_start_time = time.perf_counter()
-        start_timestamp_iso = datetime.utcnow().isoformat()
+            # Flash a rectangle so that we can synchronize the recording start time
+            flash_rect()
 
-        screenshots.init(recording_context, recording_start_time)
+            recording_start_time = time.perf_counter()
+            start_timestamp_iso = datetime.utcnow().isoformat()
 
-        user_dir: Path = Path(actions.path.talon_user())
+            screenshots.init(recording_context, recording_start_time)
 
-        actions.user.wax_log_object(
-            {
-                "type": "initialInfo",
-                "version": 2,
-                "startTimestampISO": start_timestamp_iso,
-                "talonDir": str(user_dir.parent),
-            }
-        )
+            user_dir: Path = Path(actions.path.talon_user())
+
+            actions.user.wax_log_object(
+                {
+                    "type": "initialInfo",
+                    "version": 2,
+                    "startTimestampISO": start_timestamp_iso,
+                    "talonDir": str(user_dir.parent),
+                }
+            )
+
+            app.notify("Recording started")
+        except Exception as e:
+            for recorder in active_recorders:
+                actions.sleep("250ms")
+                try:
+                    recorder.check_can_stop()
+                    recorder.stop_recording()
+                except:
+                    pass
+
+            app.notify(f"ERROR: {e}")
+
+            raise e
 
     def wax_stop_recording():
         """Stop recording screen"""
