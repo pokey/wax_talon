@@ -112,7 +112,6 @@ class Actions:
             )
 
             app.notify("Recording started")
-            actions.sleep("250ms")
         except Exception as e:
             for recorder in active_recorders:
                 actions.sleep("250ms")
@@ -123,7 +122,6 @@ class Actions:
                     pass
 
             app.notify(f"ERROR: {e}")
-            actions.sleep("250ms")
 
             raise e
 
