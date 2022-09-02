@@ -73,6 +73,7 @@ class Actions:
                 recorder.check_can_start()
         except Exception as e:
             app.notify(f"ERROR: {e}")
+            raise e
 
         recording_log_directory = recordings_root_dir / time.strftime(
             "%Y-%m-%dT%H-%M-%S"

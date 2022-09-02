@@ -42,8 +42,7 @@ class GitRecorder(Recorder):
                 continue
 
             if git("status", "--porcelain", cwd=directory):
-                app.notify("ERROR: Please commit all git changes")
-                raise Exception("Please commit all git changes")
+                raise RuntimeError("Please commit all git changes")
 
     def start_recording(self, context: RecordingContext):
         # Capture shas of all subdirectories of `.talon/user` that are `git` directories
