@@ -18,6 +18,7 @@ from talon import (
 )
 from talon.canvas import Canvas
 
+from .screenshots import screenshots
 from .types import PhraseInfo, Recorder, RecordingContext
 
 CALIBRATION_DISPLAY_BACKGROUND_COLOR = "#1b0026"
@@ -61,6 +62,7 @@ class Actions:
         global recording_start_time
         global recording_log_file
         global current_phrase_info
+        global screenshots
 
         recorders = list(
             filter(None, [recorder_1, recorder_2, recorder_3, recorder_4, recorder_5])
@@ -92,7 +94,7 @@ class Actions:
         recording_start_time = time.perf_counter()
         start_timestamp_iso = datetime.utcnow().isoformat()
 
-        actions.user.x_wax_init_screenshots(recording_context, recording_start_time)
+        screenshots.init(recording_context, recording_start_time)
 
         user_dir: Path = Path(actions.path.talon_user())
 
@@ -223,11 +225,11 @@ class RecordingUserActions:
 
         current_phrase_info = PhraseInfo(phrase_id, parsed)
 
-        actions.user.x_wax_reset_screenshots_object()
-        actions.user.wax_take_screenshot("preCommand")
+        with screenshots.init_object() as screenshots_object:
+            screenshots.take_screenshot("preCommand")
 
-        for recorder in recorders:
-            recorder.capture_pre_phrase(current_phrase_info)
+            for recorder in recorders:
+                recorder.capture_pre_phrase(current_phrase_info)
 
         actions.user.wax_log_object(
             {
@@ -245,7 +247,7 @@ class RecordingUserActions:
                 "commands": commands,
                 "modes": list(scope.get("mode")),
                 "tags": list(scope.get("tag")),
-                "screenshots": actions.user.x_wax_get_screenshots_object(),
+                "screenshots": screenshots_object,
             }
         )
 
@@ -258,8 +260,8 @@ class RecordingUserActions:
 
             post_phrase_start = time.perf_counter() - recording_start_time
 
-            actions.user.x_wax_reset_screenshots_object()
-            actions.user.wax_take_screenshot("postCommand")
+            with screenshots.init_object() as screenshots_object:
+                screenshots.take_screenshot("postCommand")
 
             # NB: This object will get merged with the pre-phrase object during
             # postprocessing.  See
@@ -274,7 +276,7 @@ class RecordingUserActions:
                             time.perf_counter() - recording_start_time
                         ),
                     },
-                    "screenshots": actions.user.x_wax_get_screenshots_object(),
+                    "screenshots": screenshots_object,
                 }
             )
 

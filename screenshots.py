@@ -1,4 +1,5 @@
 import time
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -15,22 +16,13 @@ screenshot_time_stamp_only = mod.setting(
     desc="If `True`, don't actually take a screenshot during recording just capture the timestamp so that we can extract it from the video later",
 )
 
-screenshots_directory: Path
-recording_start_time: float
-screenshots: dict
 
+class Screenshots:
+    screenshots_directory: Path
+    recording_start_time: float
+    screenshots: dict
 
-@mod.action_class
-class Actions:
-    def wax_take_screenshot(name: str):
-        """Captures the screen, either as a timestamp in video or to a file, depending on setting.  Name will determine key given to screenshot in log file"""
-        screenshot_info = take_screenshot(screenshots_directory, recording_start_time)
-
-        screenshots[name] = screenshot_info
-
-    def x_wax_init_screenshots(
-        recording_context: RecordingContext, recording_start_time_: float
-    ):
+    def init(self, recording_context: RecordingContext, recording_start_time: float):
         """
         Initialize screenshot code
 
@@ -38,41 +30,46 @@ class Actions:
             recording_context (RecordingContext): Context object with information about recording
             recording_start_time_ (float): The start time of the recording as returned by perfcounter
         """
-        global recording_start_time
-        global screenshots_directory
 
-        recording_start_time = recording_start_time_
+        self.recording_start_time = recording_start_time
 
-        screenshots_directory = (
+        self.screenshots_directory = (
             recording_context.recording_log_directory / "screenshots"
         )
-        screenshots_directory.mkdir(parents=True)
+        self.screenshots_directory.mkdir(parents=True)
 
-    def x_wax_reset_screenshots_object():
-        """Removes all screenshots from the screenshot object"""
-        global screenshots
+        self.screenshots = {}
 
-        screenshots = {}
+    @contextmanager
+    def init_object(self):
+        self.screenshots = {}
+        yield self.screenshots
 
-    def x_wax_get_screenshots_object() -> dict:
-        """Gets the screenshot object containing screenshots taken since last reset"""
-        return screenshots
+    def take_screenshot(self, name: str):
+        """Captures the screen, either as a timestamp in video or to a file, depending on setting.  Name will determine key given to screenshot in log file"""
+        timestamp = time.perf_counter() - self.recording_start_time
+
+        if screenshot_time_stamp_only.get():
+            filename = None
+        else:
+            img = screen.capture_rect(screen.main_screen().rect)
+            date = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S-%f")
+            filename = f"{date}.png"
+            path = self.screenshots_directory / filename
+            # NB: Writing the image to the file is expensive so we do it asynchronously
+            cron.after("50ms", lambda: img.write_file(path))
+
+        self.screenshots[name] = {
+            "filename": filename,
+            "timeOffset": timestamp,
+        }
 
 
-def take_screenshot(directory: Path, start_time: float):
-    timestamp = time.perf_counter() - start_time
+screenshots = Screenshots()
 
-    if screenshot_time_stamp_only.get():
-        filename = None
-    else:
-        img = screen.capture_rect(screen.main_screen().rect)
-        date = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S-%f")
-        filename = f"{date}.png"
-        path = directory / filename
-        # NB: Writing the image to the file is expensive so we do it asynchronously
-        cron.after("50ms", lambda: img.write_file(path))
 
-    return {
-        "filename": filename,
-        "timeOffset": timestamp,
-    }
+@mod.action_class
+class User:
+    def wax_take_screenshot(name: str):
+        """Captures the screen, either as a timestamp in video or to a file, depending on setting.  Name will determine key given to screenshot in log file"""
+        screenshots.take_screenshot(name)
