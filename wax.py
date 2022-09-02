@@ -114,8 +114,6 @@ class Actions:
                     "talonDir": str(user_dir.parent),
                 }
             )
-
-            app.notify("Recording started")
         except Exception as e:
             for recorder in active_recorders:
                 actions.sleep("250ms")
