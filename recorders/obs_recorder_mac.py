@@ -45,8 +45,7 @@ class ObsRecorder(Recorder):
         try:
             next(app for app in ui.apps(background=False) if app.name == "OBS")
         except StopIteration:
-            app.notify("ERROR: Please launch OBS")
-            raise
+            raise RuntimeError("Please launch OBS")
 
     def start_recording(self, context: RecordingContext):
         # Start OBS face recording
