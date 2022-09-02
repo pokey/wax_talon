@@ -50,7 +50,6 @@ class ObsRecorder(Recorder):
 
     def start_recording(self, context: RecordingContext):
         # Start OBS face recording
-        raise Exception("Oh no!")
         menu = show_obs_menu()
         menu.children.find_one(AXRole="AXMenuItem", AXTitle="Start Recording").perform(
             "AXPress"
