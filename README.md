@@ -12,7 +12,7 @@ Add the following to a Talon file:
 not tag: user.wax_is_recording
 -
 ^record start$:
-    cursorless_recorder = user.get_cursorless_recorder(1)
+    cursorless_recorder = user.get_cursorless_recorder()
     quicktime_recorder = user.get_quicktime_recorder()
     obs_recorder = user.get_obs_recorder()
     user.wax_start_recording(cursorless_recorder, quicktime_recorder, obs_recorder)

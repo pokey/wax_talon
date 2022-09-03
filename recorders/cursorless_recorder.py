@@ -23,7 +23,7 @@ recording_context: RecordingContext
 
 @mod.action_class
 class Actions:
-    def get_cursorless_recorder(should_take_mark_screenshots: bool) -> Recorder:
+    def get_cursorless_recorder(should_take_mark_screenshots: bool = True) -> Recorder:
         """Returns an object that can be used for recording cursorless commands"""
         return CursorlessRecorder(should_take_mark_screenshots)
 
