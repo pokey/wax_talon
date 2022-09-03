@@ -4,6 +4,8 @@ Record your Talon sessions. Supports QuickTime, OBS, Cursorless, as well as capt
 
 **WARNING**: This code relies on undocumented and experimental Taon APIs, so it may break with future versions of Talon.
 
+Note that the OBS recorder currently only works on MacOS, as it relies on Mac accessibility APIs to start and stop recording.
+
 ## Example
 
 Add the following to a Talon file:
