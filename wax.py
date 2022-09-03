@@ -143,20 +143,20 @@ class Actions:
         with open(recording_log_file, "a") as out:
             out.write(json.dumps(output_object) + "\n")
 
-    def x_wax_maybe_capture_phrase(j: Any):
+    def private_wax_maybe_capture_phrase(j: Any):
         """Possibly capture a phrase; does nothing unless screen recording is active"""
 
-    def x_wax_maybe_capture_post_phrase(j: Any):
+    def private_wax_maybe_capture_post_phrase(j: Any):
         """Possibly capture a phrase; does nothing unless screen recording is active"""
 
 
 @ctx.action_class("user")
 class UserActions:
-    def x_wax_maybe_capture_phrase(j: Any):
+    def private_wax_maybe_capture_phrase(j: Any):
         # Turn this one off globally
         pass
 
-    def x_wax_maybe_capture_post_phrase(j: Any):
+    def private_wax_maybe_capture_post_phrase(j: Any):
         # Turn this one off globally
         pass
 
@@ -176,7 +176,7 @@ def json_safe(arg: Any):
 
 @recording_screen_ctx.action_class("user")
 class RecordingUserActions:
-    def x_wax_maybe_capture_phrase(j: Any):
+    def private_wax_maybe_capture_phrase(j: Any):
         global current_phrase_info
 
         pre_phrase_start = time.perf_counter() - recording_start_time
@@ -271,7 +271,7 @@ class RecordingUserActions:
             }
         )
 
-    def x_wax_maybe_capture_post_phrase(j: Any):
+    def private_wax_maybe_capture_post_phrase(j: Any):
         global current_phrase_info
 
         if current_phrase_info is not None:
@@ -321,11 +321,11 @@ last_phrase = None
 
 
 def on_phrase(j):
-    actions.user.x_wax_maybe_capture_phrase(j)
+    actions.user.private_wax_maybe_capture_phrase(j)
 
 
 def on_post_phrase(j):
-    actions.user.x_wax_maybe_capture_post_phrase(j)
+    actions.user.private_wax_maybe_capture_post_phrase(j)
 
 
 speech_system.register("pre:phrase", on_phrase)

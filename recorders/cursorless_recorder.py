@@ -27,7 +27,7 @@ class Actions:
         """Returns an object that can be used for recording cursorless commands"""
         return CursorlessRecorder(should_take_mark_screenshots)
 
-    def x_wax_cursorless_snapshot(
+    def private_wax_cursorless_snapshot(
         path: str, metadata: Any, decorated_marks: list[dict]
     ):
         """Take a Cursorless pre- or post-phrase snapshot"""
@@ -35,7 +35,7 @@ class Actions:
 
 @ctx.action_class("user")
 class UserActions:
-    def x_wax_cursorless_snapshot(
+    def private_wax_cursorless_snapshot(
         path: str, metadata: Any, decorated_marks: list[dict]
     ):
         # Turn this one off globally
@@ -85,7 +85,7 @@ class CursorlessRecorder(Recorder):
     def capture_pre_phrase(self, phrase: PhraseInfo):
         decorated_marks = list(extract_decorated_marks(phrase.parsed))
 
-        actions.user.x_wax_cursorless_snapshot(
+        actions.user.private_wax_cursorless_snapshot(
             str(snapshots_directory / f"{phrase.phrase_id}-prePhrase.yaml"),
             {"phraseId": phrase.phrase_id, "type": "prePhrase"},
             decorated_marks,
@@ -95,7 +95,7 @@ class CursorlessRecorder(Recorder):
             take_mark_screenshots(decorated_marks)
 
     def capture_post_phrase(self, phrase: PhraseInfo):
-        actions.user.x_wax_cursorless_snapshot(
+        actions.user.private_wax_cursorless_snapshot(
             str(snapshots_directory / f"{phrase.phrase_id}-postPhrase.yaml"),
             {"phraseId": phrase.phrase_id, "type": "postPhrase"},
             [],
@@ -185,7 +185,7 @@ def cursorless_recording_paused():
 
 @recording_screen_vscode_ctx.action_class("user")
 class UserActions:
-    def x_wax_cursorless_snapshot(
+    def private_wax_cursorless_snapshot(
         path: str, metadata: Any, decorated_marks: list[dict]
     ):
         try:
