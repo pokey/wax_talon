@@ -52,3 +52,7 @@ You can tweak the above Talonscript to remove any of the recorders, if eg you do
 ## Postprocessing
 
 See https://github.com/pokey/voice_vid.
+
+## Making a custom recorder
+
+See the examples in [`recorders`](recorders).
