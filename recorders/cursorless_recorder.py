@@ -23,8 +23,20 @@ recording_context: RecordingContext
 
 @mod.action_class
 class Actions:
-    def get_cursorless_recorder(should_take_mark_screenshots: bool = True) -> Recorder:
-        """Returns an object that can be used for recording cursorless commands"""
+    def wax_cursorless_recorder(should_take_mark_screenshots: bool = True) -> Recorder:
+        """
+        Returns an object that can be used for recording cursorless commands.
+
+
+        Args:
+            should_take_mark_screenshots (bool, optional): Whether to highlight
+            the marks referenced in a phrase.  Can set this to False if you're
+            not recording the screen. Defaults to True.
+
+        Returns:
+            Recorder: A recorder that can be passed as an argument to
+            `user.wax_start_recording()`
+        """
         return CursorlessRecorder(should_take_mark_screenshots)
 
     def private_wax_cursorless_snapshot(

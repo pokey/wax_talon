@@ -15,14 +15,14 @@ os: mac
 
 @mod.action_class
 class Actions:
-    def get_obs_recorder() -> Recorder:
+    def wax_obs_recorder() -> Recorder:
         """Returns an object that can be used for recording OBS"""
         pass
 
 
 @ctx.action_class("user")
 class UserActions:
-    def get_obs_recorder():
+    def wax_obs_recorder():
         return ObsRecorder()
 
 
