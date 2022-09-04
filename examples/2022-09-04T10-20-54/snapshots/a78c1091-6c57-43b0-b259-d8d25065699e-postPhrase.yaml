@@ -1,0 +1,14 @@
+documentContents: |
+  not tag: user.wax_is_recording
+  -
+  ^record start$: user.start_recording(1)
+  ^record start screen$: user.start_recording(0)
+  ^record start light$: user.start_recording_light()
+selections:
+  - anchor: {line: 3, character: 8}
+    active: {line: 3, character: 8}
+metadata: {phraseId: a78c1091-6c57-43b0-b259-d8d25065699e, type: postPhrase}
+visibleRanges:
+  - start: {line: 0, character: 0}
+    end: {line: 5, character: 0}
+timeOffsetSeconds: 13.201687

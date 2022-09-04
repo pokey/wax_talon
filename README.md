@@ -1,6 +1,6 @@
 # Wax Talon
 
-Record your Talon sessions. Supports QuickTime, OBS, Cursorless, as well as capturing information about Talon commands, rules, phrase timing, etc. For an example of a video generated using this recorder and its associated [postprocessor](https://github.com/pokey/voice_vid), see https://pokey.github.io/videos/P2QKl-g4CGs/. For an example of the raw output of this recording code, see [the example](examples/2022-09-04T10-03-35/)
+Record your Talon sessions. Supports QuickTime, OBS, Cursorless, as well as capturing information about Talon commands, rules, phrase timing, etc. For an example of a video generated using this recorder and its associated [postprocessor](https://github.com/pokey/voice_vid), see https://pokey.github.io/videos/P2QKl-g4CGs/. For an example of the raw output of this recording code, see [the example](examples/2022-09-04T10-20-54/)
 
 **WARNING**: This code relies on undocumented and experimental Taon APIs, so it may break with future versions of Talon.
 
