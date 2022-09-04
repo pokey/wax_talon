@@ -275,12 +275,12 @@ class RecordingUserActions:
         global current_phrase_info
 
         if current_phrase_info is not None:
-            for recorder in recorders:
-                recorder.capture_post_phrase(current_phrase_info)
-
             post_phrase_start = time.perf_counter() - recording_start_time
 
             with screenshots.init_object() as screenshots_object:
+                for recorder in recorders:
+                    recorder.capture_post_phrase(current_phrase_info)
+
                 screenshots.take_screenshot("postCommand")
 
             # NB: This object will get merged with the pre-phrase object during

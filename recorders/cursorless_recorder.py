@@ -13,7 +13,7 @@ ctx = Context()
 
 recording_screen_vscode_ctx = Context()
 recording_screen_vscode_ctx.matches = r"""
-tag: user.recording_screen
+tag: user.wax_is_recording
 app: vscode
 """
 
