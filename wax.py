@@ -162,6 +162,7 @@ def finish_init(canvas: Canvas) -> None:
     # flash so that we can guarantee that the timestamp is while the flash is
     # displaying
     global recording_start_time
+    print("finish_init")
 
     recording_start_time = time.perf_counter()
     start_timestamp_iso = datetime.utcnow().isoformat()
@@ -185,6 +186,7 @@ def flash_rect():
         c.paint.style = c.paint.Style.FILL
         c.paint.color = CALIBRATION_DISPLAY_BACKGROUND_COLOR
         c.draw_rect(rect)
+        print("on_draw")
         cron.after(CALIBRATION_DISPLAY_DURATION, lambda: finish_init(canvas))
 
     canvas = Canvas.from_rect(rect)
