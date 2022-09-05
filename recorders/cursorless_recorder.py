@@ -55,6 +55,8 @@ class UserActions:
 
 
 class CursorlessRecorder(Recorder):
+    has_calibration_display = True
+
     def __init__(self, should_take_mark_screenshots):
         self.should_take_mark_screenshots = should_take_mark_screenshots
 

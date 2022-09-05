@@ -68,6 +68,12 @@ class Actions:
             filter(None, [recorder_1, recorder_2, recorder_3, recorder_4, recorder_5])
         ) + [actions.user.get_git_recorder()]
 
+        # Put recorders with calibration display last so they will show up in
+        # any screen recording
+        recorders = [
+            recorder for recorder in recorders if not recorder.has_calibration_display
+        ] + [recorder for recorder in recorders if recorder.has_calibration_display]
+
         try:
             for recorder in recorders:
                 recorder.check_can_start()
@@ -109,6 +115,7 @@ class Actions:
                 }
             )
         except Exception as e:
+            # In case of error, stop any recorders that we started
             for recorder in active_recorders:
                 actions.sleep("250ms")
                 try:

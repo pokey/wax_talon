@@ -15,6 +15,13 @@ class PhraseInfo:
 
 
 class Recorder:
+    # Set this to true if the given recorder shows a calibration display at the
+    # start so that it will be run after all the other recorders have started.
+    # In particular this will attempt to ensure that it runs after screen
+    # recording has begun so the calibration display makes it into the final
+    # recording
+    has_calibration_display = False
+
     def check_can_start(self):
         """
         Checks that the necessary prerequisites are met to begin recording;
