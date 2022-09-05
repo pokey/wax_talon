@@ -49,5 +49,5 @@ def draw_text(c, text: str, x: int, y: int):
     c.paint.imagefilter = filter
 
     c.paint.style = c.paint.Style.FILL
-    c.paint.color = "6495ED"
+    c.paint.color = "ffffff"
     c.draw_text(text, x, y)

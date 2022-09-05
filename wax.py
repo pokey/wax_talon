@@ -64,47 +64,45 @@ class Actions:
         global current_phrase_info
         global screenshots
 
-        actions.user.notify_sticky("Initializing recorder...")
-
-        non_null_recorders = list(
-            filter(None, [recorder_1, recorder_2, recorder_3, recorder_4, recorder_5])
-        ) + [actions.user.get_git_recorder()]
-
-        # Put recorders with calibration display last so they will show up in
-        # any screen recording
-        recorders = [
-            recorder
-            for recorder in non_null_recorders
-            if not recorder.has_calibration_display
-        ] + [
-            recorder
-            for recorder in non_null_recorders
-            if recorder.has_calibration_display
-        ]
-
-        try:
-            for recorder in recorders:
-                recorder.check_can_start()
-        except Exception as e:
-            app.notify(f"ERROR: {e}")
-            raise e
-
-        recording_log_directory = recordings_root_dir / time.strftime(
-            "%Y-%m-%dT%H-%M-%S"
-        )
-        recording_log_directory.mkdir(parents=True)
-
-        recording_log_file = recording_log_directory / "talon-log.jsonl"
-
-        ctx.tags = ["user.wax_is_recording"]
-
-        current_phrase_info = None
-
-        recording_context = RecordingContext(recording_log_directory)
-
         active_recorders = []
 
         try:
+            actions.user.notify_sticky("Initializing recorder...")
+
+            non_null_recorders = list(
+                filter(
+                    None, [recorder_1, recorder_2, recorder_3, recorder_4, recorder_5]
+                )
+            ) + [actions.user.get_git_recorder()]
+
+            # Put recorders with calibration display last so they will show up in
+            # any screen recording
+            recorders = [
+                recorder
+                for recorder in non_null_recorders
+                if not recorder.has_calibration_display
+            ] + [
+                recorder
+                for recorder in non_null_recorders
+                if recorder.has_calibration_display
+            ]
+
+            for recorder in recorders:
+                recorder.check_can_start()
+
+            recording_log_directory = recordings_root_dir / time.strftime(
+                "%Y-%m-%dT%H-%M-%S"
+            )
+            recording_log_directory.mkdir(parents=True)
+
+            recording_log_file = recording_log_directory / "talon-log.jsonl"
+
+            ctx.tags = ["user.wax_is_recording"]
+
+            current_phrase_info = None
+
+            recording_context = RecordingContext(recording_log_directory)
+
             for recorder in recorders:
                 actions.sleep("250ms")
                 recorder.start_recording(recording_context)
@@ -134,9 +132,9 @@ class Actions:
 
             app.notify(f"ERROR: {e}")
 
-            raise e
+            raise
         finally:
-            actions.user.hide_sticky_notification("Initializing recorder...")
+            actions.user.hide_sticky_notification()
 
     def wax_stop_recording():
         """Stop recording screen"""
