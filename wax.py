@@ -64,6 +64,8 @@ class Actions:
         global current_phrase_info
         global screenshots
 
+        actions.user.notify_sticky("Initializing recorder...")
+
         non_null_recorders = list(
             filter(None, [recorder_1, recorder_2, recorder_3, recorder_4, recorder_5])
         ) + [actions.user.get_git_recorder()]
@@ -133,6 +135,8 @@ class Actions:
             app.notify(f"ERROR: {e}")
 
             raise e
+        finally:
+            actions.user.hide_sticky_notification("Initializing recorder...")
 
     def wax_stop_recording():
         """Stop recording screen"""
