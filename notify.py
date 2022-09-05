@@ -1,6 +1,7 @@
+# Mostly taken from https://github.com/AndreasArvidsson/andreas-talon/blob/a75f09ab67a979fca8032a2ab3304fac36220608/misc/screen.py
 from typing import Optional
 
-from talon import Module, cron, ui
+from talon import Module, ui
 from talon.canvas import Canvas
 from talon.skia import Paint as Paint
 from talon.skia.imagefilter import ImageFilter as ImageFilter
