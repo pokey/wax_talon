@@ -1,0 +1,13 @@
+documentContents: |
+  const whatever = "test";
+
+  const another = whatever;
+  testing 
+selections:
+  - anchor: {line: 3, character: 8}
+    active: {line: 3, character: 8}
+metadata: {phraseId: fa7bcb91-e552-48be-addc-7948dbc87749, type: prePhrase}
+visibleRanges:
+  - start: {line: 0, character: 0}
+    end: {line: 4, character: 0}
+timeOffsetSeconds: 15.271965

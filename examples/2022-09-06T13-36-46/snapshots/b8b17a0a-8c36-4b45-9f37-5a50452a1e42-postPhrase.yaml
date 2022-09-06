@@ -1,0 +1,13 @@
+documentContents: |
+  const whatever = "test";
+
+  const another = whatever;
+  testing
+selections:
+  - anchor: {line: 3, character: 7}
+    active: {line: 3, character: 7}
+metadata: {phraseId: b8b17a0a-8c36-4b45-9f37-5a50452a1e42, type: postPhrase}
+visibleRanges:
+  - start: {line: 0, character: 0}
+    end: {line: 4, character: 0}
+timeOffsetSeconds: 11.565083

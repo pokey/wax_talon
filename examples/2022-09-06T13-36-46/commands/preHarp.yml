@@ -1,0 +1,35 @@
+languageId: typescript
+command:
+  spokenForm: pre harp
+  version: 2
+  targets:
+    - type: primitive
+      mark: {type: decoratedSymbol, symbolColor: default, character: h}
+  usePrePhraseSnapshot: true
+  action: {name: setSelectionBefore}
+initialState:
+  documentContents: |
+    const whatever = "test";
+
+    const another = whatever;
+  selections:
+    - anchor: {line: 3, character: 0}
+      active: {line: 3, character: 0}
+  marks:
+    default.h:
+      start: {line: 0, character: 6}
+      end: {line: 0, character: 14}
+  timeOffsetSeconds: 7.944527
+finalState:
+  documentContents: |
+    const whatever = "test";
+
+    const another = whatever;
+  selections:
+    - anchor: {line: 0, character: 6}
+      active: {line: 0, character: 6}
+  thatMark:
+    - anchor: {line: 0, character: 6}
+      active: {line: 0, character: 14}
+  timeOffsetSeconds: 7.968255
+fullTargets: [{type: primitive, mark: {type: decoratedSymbol, symbolColor: default, character: h}, modifiers: []}]
