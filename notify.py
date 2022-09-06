@@ -31,6 +31,8 @@ class Actions:
 
     def hide_sticky_notification():
         """Hide notification"""
+        global canvas
+
         if canvas is not None:
             canvas.close()
             canvas = None
