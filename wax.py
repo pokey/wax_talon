@@ -67,7 +67,7 @@ class Actions:
         active_recorders = []
 
         try:
-            actions.user.notify_sticky("Initializing recorder...")
+            actions.user.private_wax_notify_sticky("Initializing recorder...")
 
             non_null_recorders = list(
                 filter(
@@ -134,7 +134,7 @@ class Actions:
 
             raise
         finally:
-            actions.user.hide_sticky_notification()
+            actions.user.private_wax_hide_sticky_notification()
 
     def wax_stop_recording():
         """Stop recording screen"""

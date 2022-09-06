@@ -13,7 +13,7 @@ canvas: Optional[Canvas] = None
 
 @mod.action_class
 class Actions:
-    def notify_sticky(text: str):
+    def private_wax_notify_sticky(text: str):
         """Show notification"""
         global canvas
 
@@ -29,7 +29,7 @@ class Actions:
         canvas.register("draw", on_draw)
         canvas.freeze()
 
-    def hide_sticky_notification():
+    def private_wax_hide_sticky_notification():
         """Hide notification"""
         global canvas
 
