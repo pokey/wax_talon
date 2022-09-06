@@ -33,6 +33,7 @@ class Actions:
         """Hide notification"""
         if canvas is not None:
             canvas.close()
+            canvas = None
 
 
 def set_text_size_and_get_rect(c, height: int, text: str):

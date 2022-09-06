@@ -138,14 +138,19 @@ class Actions:
 
     def wax_stop_recording():
         """Stop recording screen"""
-        for recorder in recorders:
-            recorder.check_can_stop()
+        try:
+            for recorder in recorders:
+                recorder.check_can_stop()
 
-        ctx.tags = []
+            ctx.tags = []
 
-        for recorder in recorders:
-            actions.sleep("250ms")
-            recorder.stop_recording()
+            for recorder in recorders:
+                actions.sleep("250ms")
+                recorder.stop_recording()
+        except Exception as e:
+            app.notify(f"ERROR: {e}")
+
+            raise
 
     def wax_log_object(output_object: dict):
         """Log an object to the wax recording log"""
