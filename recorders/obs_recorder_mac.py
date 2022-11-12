@@ -43,7 +43,7 @@ class ObsRecorder(Recorder):
     def check_can_start(self):
         # Ensure that OBS is running
         try:
-            next(app for app in ui.apps(background=False) if app.name == "OBS")
+            next(app for app in ui.apps(background=False) if app.name.startswith("OBS"))
         except StopIteration:
             raise RuntimeError("Please launch OBS")
 
