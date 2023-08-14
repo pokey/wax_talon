@@ -127,27 +127,24 @@ def take_mark_screenshots(decorated_marks: list[dict]):
     if not decorated_marks:
         return None
 
-    all_decorated_marks_target = {
-        "type": "list",
-        "elements": [{"type": "primitive", "mark": mark} for mark in decorated_marks],
-    }
+    all_decorated_marks_target = actions.user.cursorless_v1_build_list_target(
+        [
+            actions.user.cursorless_v1_build_primitive_target([], mark)
+            for mark in decorated_marks
+        ]
+    )
 
     with cursorless_recording_paused():
-        actions.user.cursorless_single_target_command(
-            "highlight", all_decorated_marks_target, "highlight1"
+        actions.user.cursorless_v1_action_highlight(
+            all_decorated_marks_target, "highlight1"
         )
 
         actions.sleep("50ms")
 
         actions.user.wax_take_screenshot("decoratedMarks.all")
 
-        actions.user.cursorless_single_target_command(
-            "highlight",
-            {
-                "type": "primitive",
-                "mark": {"type": "nothing"},
-            },
-            "highlight1",
+        actions.user.cursorless_v1_action_highlight(
+            actions.user.cursorless_v1_target_nothing(), "highlight1"
         )
 
 
@@ -157,37 +154,9 @@ def extract_decorated_marks(parsed: Iterable[list[Any]]):
             items = capture if isinstance(capture, list) else [capture]
             for item in items:
                 try:
-                    type = item["type"]
-                except (KeyError, TypeError):
+                    yield from actions.user.cursorless_v1_extract_decorated_marks(item)
+                except TypeError:
                     continue
-
-                if type not in {"primitive", "list", "range"}:
-                    continue
-
-                yield from extract_decorated_marks_from_target(item)
-
-
-def extract_decorated_marks_from_target(target: dict):
-    type = target["type"]
-
-    if type == "primitive":
-        yield from extract_decorated_marks_from_primitive_target(target)
-    elif type == "range":
-        yield from extract_decorated_marks_from_primitive_target(target["start"])
-        yield from extract_decorated_marks_from_primitive_target(target["end"])
-    elif type == "list":
-        for element in target["elements"]:
-            yield from extract_decorated_marks_from_target(element)
-
-
-def extract_decorated_marks_from_primitive_target(target: dict):
-    try:
-        mark = target["mark"]
-    except KeyError:
-        return
-
-    if mark["type"] == "decoratedSymbol":
-        yield mark
 
 
 @contextmanager
