@@ -34,6 +34,6 @@ class QuicktimeRecorder(Recorder):
 
     def stop_recording(self):
         # Stop quicktime screen recording
-        ui.apps(bundle="com.apple.screencaptureui")[0].children.find_one(
+        ui.apps(bundle="com.apple.screencaptureui")[-1].children.find_one(
             AXRole="AXMenuBarItem"
         ).perform("AXPress")
