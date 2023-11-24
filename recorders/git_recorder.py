@@ -42,7 +42,9 @@ class GitRecorder(Recorder):
                 continue
 
             if git("status", "--porcelain", cwd=directory):
-                app.notify("WARNING: Uncommitted changes to Talon user dir")
+                app.notify(
+                    f"WARNING: Uncommitted changes to Talon user dir in {directory}"
+                )
 
     def start_recording(self, context: RecordingContext):
         # Capture shas of all subdirectories of `.talon/user` that are `git` directories
