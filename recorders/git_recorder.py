@@ -42,8 +42,9 @@ class GitRecorder(Recorder):
                 continue
 
             if git("status", "--porcelain", cwd=directory):
+                relative = directory.relative_to(actions.path.talon_user())
                 app.notify(
-                    f"WARNING: Uncommitted changes to Talon user dir in {directory}"
+                    f"WARNING: Uncommitted changes to Talon user dir in {relative}"
                 )
 
     def start_recording(self, context: RecordingContext):
