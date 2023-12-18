@@ -127,15 +127,15 @@ def take_mark_screenshots(decorated_marks: list[dict]):
     if not decorated_marks:
         return None
 
-    all_decorated_marks_target = actions.user.cursorless_v1_build_list_target(
+    all_decorated_marks_target = actions.user.cursorless_private_build_list_target(
         [
-            actions.user.cursorless_v1_build_primitive_target([], mark)
+            actions.user.cursorless_private_build_primitive_target([], mark)
             for mark in decorated_marks
         ]
     )
 
     with cursorless_recording_paused():
-        actions.user.cursorless_v1_action_highlight(
+        actions.user.cursorless_private_action_highlight(
             all_decorated_marks_target, "highlight1"
         )
 
@@ -143,8 +143,8 @@ def take_mark_screenshots(decorated_marks: list[dict]):
 
         actions.user.wax_take_screenshot("decoratedMarks.all")
 
-        actions.user.cursorless_v1_action_highlight(
-            actions.user.cursorless_v1_target_nothing(), "highlight1"
+        actions.user.cursorless_private_action_highlight(
+            actions.user.cursorless_private_target_nothing(), "highlight1"
         )
 
 
@@ -154,7 +154,9 @@ def extract_decorated_marks(parsed: Iterable[list[Any]]):
             items = capture if isinstance(capture, list) else [capture]
             for item in items:
                 try:
-                    yield from actions.user.cursorless_v1_extract_decorated_marks(item)
+                    yield from actions.user.cursorless_private_extract_decorated_marks(
+                        item
+                    )
                 except TypeError:
                     continue
 
