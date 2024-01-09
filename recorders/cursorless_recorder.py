@@ -1,8 +1,8 @@
+import json
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterable
 
-import yaml
 from talon import Context, Module, actions, ui
 from talon.ui import UIErr
 
@@ -100,7 +100,7 @@ class CursorlessRecorder(Recorder):
         decorated_marks = list(extract_decorated_marks(phrase.parsed))
 
         actions.user.private_wax_cursorless_snapshot(
-            str(snapshots_directory / f"{phrase.phrase_id}-prePhrase.yaml"),
+            str(snapshots_directory / f"{phrase.phrase_id}-prePhrase"),
             {"phraseId": phrase.phrase_id, "type": "prePhrase"},
             decorated_marks,
         )
@@ -110,7 +110,7 @@ class CursorlessRecorder(Recorder):
 
     def capture_post_phrase(self, phrase: PhraseInfo):
         actions.user.private_wax_cursorless_snapshot(
-            str(snapshots_directory / f"{phrase.phrase_id}-postPhrase.yaml"),
+            str(snapshots_directory / f"{phrase.phrase_id}-postPhrase"),
             {"phraseId": phrase.phrase_id, "type": "postPhrase"},
             [],
         )
@@ -179,26 +179,16 @@ class UserActions:
             use_pre_phrase_snapshot = False
 
         try:
-            ui.active_window().children.find_one(AXRole="AXMenu", max_depth=0)
-            menu_showing = True
-        except UIErr:
-            menu_showing = False
-
-        if not menu_showing:
-            try:
-                actions.user.vscode_with_plugin_and_wait(
-                    "cursorless.takeSnapshot",
-                    path,
-                    metadata,
-                    decorated_marks,
-                    use_pre_phrase_snapshot,
-                )
-            except Exception as e:
-                with open(path, "w") as f:
-                    yaml.dump({"metadata": metadata, "error": str(e)}, f)
-        else:
-            with open(path, "w") as f:
-                yaml.dump({"metadata": metadata, "isMenuShowing": True}, f)
+            actions.user.vscode_with_plugin_and_wait(
+                "cursorless.takeSnapshot",
+                f"{path}.yaml",
+                metadata,
+                decorated_marks,
+                use_pre_phrase_snapshot,
+            )
+        except Exception as e:
+            with open(f"{path}.json", "w") as f:
+                json.dump({"metadata": metadata, "error": str(e)}, f)
 
 
 editor_names = ["Visual Studio Code", "Code", "VSCodium", "Codium", "code-oss"]
